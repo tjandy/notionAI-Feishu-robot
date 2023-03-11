@@ -4,9 +4,20 @@ import json
 import abc
 import hashlib
 import typing as t
-from utils import dict_2_obj
 from flask import request, jsonify
-from decrypt import AESCipher
+
+
+class Obj(dict):
+    def __init__(self, d):
+        for a, b in d.items():
+            if isinstance(b, (list, tuple)):
+                setattr(self, a, [Obj(x) if isinstance(x, dict) else x for x in b])
+            else:
+                setattr(self, a, Obj(b) if isinstance(b, dict) else b)
+
+
+def dict_2_obj(d: dict):
+    return Obj(d)
 
 
 class Event(object):
@@ -83,7 +94,7 @@ class EventManager(object):
     @staticmethod
     def get_handler_with_event(token, encrypt_key):
         dict_data = json.loads(request.data)
-        dict_data = EventManager._decrypt_data(encrypt_key, dict_data)
+        #dict_data = EventManager._decrypt_data(encrypt_key, dict_data)
         callback_type = dict_data.get("type")
         # only verification data has callback_type, else is event
         if callback_type == "url_verification":
@@ -102,17 +113,17 @@ class EventManager(object):
         # get handler
         return EventManager.event_callback_map.get(event_type), event
 
-    @staticmethod
-    def _decrypt_data(encrypt_key, data):
-        encrypt_data = data.get("encrypt")
-        if encrypt_key == "" and encrypt_data is None:
-            # data haven't been encrypted
-            return data
-        if encrypt_key == "":
-            raise Exception("ENCRYPT_KEY is necessary")
-        cipher = AESCipher(encrypt_key)
+    # @staticmethod
+    # def _decrypt_data(encrypt_key, data):
+    #     encrypt_data = data.get("encrypt")
+    #     if encrypt_key == "" and encrypt_data is None:
+    #         # data haven't been encrypted
+    #         return data
+    #     if encrypt_key == "":
+    #         raise Exception("ENCRYPT_KEY is necessary")
+    #     cipher = AESCipher(encrypt_key)
 
-        return json.loads(cipher.decrypt_string(encrypt_data))
+    #     return json.loads(cipher.decrypt_string(encrypt_data))
 
 
 class InvalidEventException(Exception):
