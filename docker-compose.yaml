@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  app:
+    container_name: lark-notionai-assistant
+    build: .
+    restart: always
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
