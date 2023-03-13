@@ -32,7 +32,7 @@ class Event(object):
             raise InvalidEventException("request is not callback event(v2)")
         self.header = dict_2_obj(header)
         self.event = dict_2_obj(event)
-        self._validate(token, encrypt_key)
+        #self._validate(token, encrypt_key)
 
     def _validate(self, token, encrypt_key):
         if self.header.token != token:

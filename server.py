@@ -86,17 +86,14 @@ def msg_error_handler(ex):
     return response
 
 
-@app.route("/notionAI", methods=["POST"])
+@app.route("/")
 def callback_event_handler():
     # init callback instance and handle
     event_handler, event = event_manager.get_handler_with_event(VERIFICATION_TOKEN, ENCRYPT_KEY)
 
     return event_handler(event)
 
-@app.route('/')
-def home():
-    return "Hello World"
 
 if __name__ == "__main__":
     # init()
-    app.run(host="0.0.0.0", port=8080, debug=False)
+    app.run(host="0.0.0.0", port=8080, debug=True)
